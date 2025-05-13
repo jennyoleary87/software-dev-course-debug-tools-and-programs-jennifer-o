@@ -4,6 +4,11 @@ const cart = [
   { name: "Headphones", price: 200 }
 ];
 
+let emptyCart = [];
+
+const totalText = document.getElementById("total");
+const receiptText = document.getElementById("receipt");
+
 function calculateTotal(cartItems) {
   let total = 0;
   for (let i = 0; i < cartItems.length; i++) { // Bug: <= should be <
@@ -18,7 +23,6 @@ Uncaught TypeError: cartItems[i] is undefined
     <anonymous> http://127.0.0.1:5500/cart.js:33
 
 When the browser tool console is opened, this ^^ immediately pops up.
-The program works so it was left alone. 
 */
 
 function applyDiscount(total, discountRate) {
@@ -34,20 +38,37 @@ function generateReceipt(cartItems, total) {
     receipt += `\n${item.name}: $${item.price}\n`;
   });
   receipt += `Total: $${total.toFixed(2)}`; // Bug: total may not be a number ; SET BREAKPOINT
+  receiptText.textContent = receipt;
+  totalText.textContent = `Total: $${total}`;
   return receipt;
 }
 
 // Debugging entry point
-console.log("Starting shopping cart calculation...");
-const total = calculateTotal(cart);
-const discountedTotal = applyDiscount(total, 0.2); // 20% discount
-const receipt = generateReceipt(cart, discountedTotal);
+try {
+  console.log("Starting shopping cart calculation...");
+  const total = calculateTotal(cart);
+  const discountedTotal = applyDiscount(total, 0.2); // 20% discount
+  const receipt = generateReceipt(cart, discountedTotal);
 
-document.getElementById("total").textContent = `Total: $${total}`;
-document.getElementById("receipt").textContent = receipt;
+} catch (error) {
+  console.log("Error: ", error.message);
+  console.error(e);
+}
+
 
 // test cases
-test('empty cart', () => {
-  const total = calculateTotal(emptyCart);
-  expect(total).toBe(0);
-})
+
+// function tests(cartItems, discountRate) {
+
+try {
+  // empty cart
+  let emptyTotal = calculateTotal(emptyCart);
+  let emptyDiscount = applyDiscount(emptyTotal, 0.35);
+  let emptyReceipt = generateReceipt(emptyCart, emptyDiscount);
+  console.log(`total: ${emptyTotal}, discounted total: ${emptyDiscount}, receipt: ${emptyReceipt}`);
+
+} catch (error) {
+  console.log("Error: ", error.message);
+  console.error(e);
+}
+//}
