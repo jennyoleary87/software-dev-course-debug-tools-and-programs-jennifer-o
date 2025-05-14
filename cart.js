@@ -18,6 +18,8 @@ Uncaught TypeError: cartItems[i] is undefined
     <anonymous> http://127.0.0.1:5500/cart.js:33
 
 When the browser tool console is opened, this ^^ immediately pops up.
+removing the = sign made the loop end before that previous final iteration
+debug tools showed me how the loop was being performed
 */
 
 function applyDiscount(total, discountRate) {
@@ -26,6 +28,7 @@ function applyDiscount(total, discountRate) {
   }
   return total - total * discountRate;
   // return total - (total * discountRate); // Bug: Missing validation for discountRate ; SET BREAKPOINT
+  // added validation for what to do when the rate is not a number
 }
 
 function generateReceipt(cartItems, total) {
@@ -37,6 +40,7 @@ function generateReceipt(cartItems, total) {
     receipt += `\n${item.name}: $${item.price.toFixed(2)}\n`;
   });
   receipt += `Total: $${total.toFixed(2)}`; // Bug: total may not be a number ; SET BREAKPOINT
+  // added validation again for what to do if total is not a number
   return receipt;
 }
 
