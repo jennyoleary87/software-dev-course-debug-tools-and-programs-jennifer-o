@@ -4,11 +4,6 @@ const cart = [
   { name: "Headphones", price: 200 }
 ];
 
-let emptyCart = [];
-
-const totalText = document.getElementById("total");
-const receiptText = document.getElementById("receipt");
-
 function calculateTotal(cartItems) {
   let total = 0;
   for (let i = 0; i < cartItems.length; i++) { // Bug: <= should be <
@@ -26,49 +21,72 @@ When the browser tool console is opened, this ^^ immediately pops up.
 */
 
 function applyDiscount(total, discountRate) {
-  const discountedTotal = total - (total * discountRate);
-  return discountedTotal;
+  if (isNaN(discountRate)) {
+    throw new Error("discount rate is not valid")
+  }
+  return total - total * discountRate;
   // return total - (total * discountRate); // Bug: Missing validation for discountRate ; SET BREAKPOINT
-  // define variable for the discounted total so we can use it later.
 }
 
 function generateReceipt(cartItems, total) {
+  if (isNaN(total)) {
+    throw new Error("not a number")
+  }
   let receipt = "Items:\n";
   cartItems.forEach((item) => {
-    receipt += `\n${item.name}: $${item.price}\n`;
+    receipt += `\n${item.name}: $${item.price.toFixed(2)}\n`;
   });
   receipt += `Total: $${total.toFixed(2)}`; // Bug: total may not be a number ; SET BREAKPOINT
-  receiptText.textContent = receipt;
-  totalText.textContent = `Total: $${total}`;
   return receipt;
 }
 
 // Debugging entry point
-try {
-  console.log("Starting shopping cart calculation...");
-  const total = calculateTotal(cart);
-  const discountedTotal = applyDiscount(total, 0.2); // 20% discount
-  const receipt = generateReceipt(cart, discountedTotal);
+console.log("Starting shopping cart calculation...");
+const total = calculateTotal(cart);
+const discountedTotal = applyDiscount(total, 0.2); // 20% discount
+const receipt = generateReceipt(cart, discountedTotal);
+document.getElementById("total").textContent = `Total: $${discountedTotal}`;
+document.getElementById("receipt").textContent = receipt;
 
+// Test the corrected program with the given cart and a few edge cases:
+// i. An empty cart.
+// ii. A cart with one item.
+// iii. A discountRate of 0 or 1.
+
+// empty cart
+try {
+  const emptyCart = [];
+  const emptyTotal = calculateTotal(emptyCart);
+  const emptyDiscount = applyDiscount(emptyTotal, 0.3);
+  const emptyReceipt = generateReceipt(emptyCart, emptyDiscount);
+  document.getElementById("emptyTotalText").textContent = `EMPTY Cart Total: ${emptyDiscount}`;
+  document.getElementById("emptyReceipt").textContent = emptyReceipt;
+  console.log(`EMPTY total: ${emptyTotal}, discounted total: ${emptyDiscount}, receipt: ${emptyReceipt}`);
 } catch (error) {
-  console.log("Error: ", error.message);
-  console.error(e);
+  console.error("empty error: ", error.message);
 }
 
-
-// test cases
-
-// function tests(cartItems, discountRate) {
-
+// single item cart
 try {
-  // empty cart
-  let emptyTotal = calculateTotal(emptyCart);
-  let emptyDiscount = applyDiscount(emptyTotal, 0.35);
-  let emptyReceipt = generateReceipt(emptyCart, emptyDiscount);
-  console.log(`total: ${emptyTotal}, discounted total: ${emptyDiscount}, receipt: ${emptyReceipt}`);
-
+  const singleItemCart = [{ name: "Controller", price: 45 }];
+  const singleTotal = calculateTotal(singleItemCart);
+  const singleDiscount = applyDiscount(singleTotal, 0.65);
+  const singleReceipt = generateReceipt(singleItemCart, singleDiscount);
+  document.getElementById("singleTotalText").textContent = `SINGLE Cart Total: ${singleDiscount}`;
+  document.getElementById("singleReceipt").textContent = singleReceipt;
+  console.log(`SINGLE total: ${singleTotal}, discounted total: ${singleDiscount}, receipt: ${singleReceipt}`);
 } catch (error) {
-  console.log("Error: ", error.message);
-  console.error(e);
+  console.error("single error: ", error.message);
 }
-//}
+
+// zero discount
+try {
+  const noDiscountTotal = calculateTotal(cart);
+  const noDiscount = applyDiscount(noDiscountTotal, 0.0);
+  const noDiscountReceipt = generateReceipt(cart, noDiscount);
+  document.getElementById("noDiscountText").textContent = `NO DISCOUNT Cart Total: ${noDiscount}`;
+  document.getElementById("noDiscountReceipt").textContent = noDiscountReceipt;
+  console.log(`NO DISCOUNT total: ${noDiscountTotal}, discounted total: ${noDiscount}, receipt: ${noDiscountReceipt}`);
+} catch (error) {
+  console.error("noDiscount error: ", error.message);
+}
